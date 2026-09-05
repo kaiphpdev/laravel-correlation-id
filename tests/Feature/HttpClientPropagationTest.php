@@ -2,92 +2,193 @@
 
 namespace LaravelCorrelationId\Tests\Feature;
 
-use Illuminate\Http\Client\Request;
-use Illuminate\Support\Facades\Http;
+use GuzzleHttp\Psr7\Request;
 use LaravelCorrelationId\CorrelationIdManager;
+use LaravelCorrelationId\Http\CorrelationIdRequestMiddleware;
 use LaravelCorrelationId\Tests\TestCase;
+use LaravelCorrelationId\Tracing\TraceparentGenerator;
 
 class HttpClientPropagationTest extends TestCase
 {
-    public function test_it_propagates_correlation_id_to_outgoing_http_requests(): void
+    public function test_it_adds_correlation_id_to_outgoing_request(): void
     {
-        Http::fake();
+        $manager = $this->app->make(CorrelationIdManager::class);
+        $manager->set('client-correlation-id');
 
-        $manager = $this->app->make(
-            CorrelationIdManager::class
+        $middleware = new CorrelationIdRequestMiddleware(
+            $manager,
+            new TraceparentGenerator
         );
 
-        $manager->set('abc-123');
+        $request = new Request(
+            'GET',
+            'https://example.com'
+        );
 
-        Http::get('https://example.test');
+        $request = $middleware($request);
 
-        Http::assertSent(function (Request $request) {
-            return $request->hasHeader(
-                'X-Correlation-ID',
-                'abc-123'
-            );
-        });
+        $this->assertSame(
+            'client-correlation-id',
+            $request->getHeaderLine('X-Correlation-ID')
+        );
     }
 
-    public function test_it_does_not_add_header_when_correlation_id_is_missing(): void
+    public function test_it_adds_traceparent_when_w3c_is_enabled(): void
     {
-        Http::fake();
+        config()->set('correlation-id.w3c.enabled', true);
+        config()->set(
+            'correlation-id.w3c.propagate_traceparent',
+            true
+        );
 
-        Http::get('https://example.test');
+        $traceId = '4bf92f3577b34da6a3ce929d0e0e4736';
 
-        Http::assertSent(function (Request $request) {
-            return ! $request->hasHeader(
-                'X-Correlation-ID'
-            );
-        });
+        $manager = $this->app->make(CorrelationIdManager::class);
+        $manager->set($traceId);
+
+        $middleware = new CorrelationIdRequestMiddleware(
+            $manager,
+            new TraceparentGenerator
+        );
+
+        $request = new Request(
+            'GET',
+            'https://example.com'
+        );
+
+        $request = $middleware($request);
+
+        $this->assertSame(
+            $traceId,
+            $request->getHeaderLine('X-Correlation-ID')
+        );
+
+        $this->assertMatchesRegularExpression(
+            '/^00-'.$traceId.'-[\da-f]{16}-00$/',
+            $request->getHeaderLine('traceparent')
+        );
     }
 
-    public function test_it_does_not_propagate_id_when_http_client_is_disabled(): void
+    public function test_it_does_not_add_traceparent_for_uuid_correlation_id(): void
+    {
+        config()->set('correlation-id.w3c.enabled', true);
+        config()->set(
+            'correlation-id.w3c.propagate_traceparent',
+            true
+        );
+
+        $correlationId = '3723963a-4a1b-4775-86de-6b59aa18e03c';
+
+        $manager = $this->app->make(CorrelationIdManager::class);
+        $manager->set($correlationId);
+
+        $middleware = new CorrelationIdRequestMiddleware(
+            $manager,
+            new TraceparentGenerator
+        );
+
+        $request = new Request(
+            'GET',
+            'https://example.com'
+        );
+
+        $request = $middleware($request);
+
+        $this->assertSame(
+            $correlationId,
+            $request->getHeaderLine('X-Correlation-ID')
+        );
+
+        $this->assertFalse(
+            $request->hasHeader('traceparent')
+        );
+    }
+
+    public function test_it_does_not_add_traceparent_when_w3c_is_disabled(): void
+    {
+        config()->set('correlation-id.w3c.enabled', false);
+
+        $traceId = '4bf92f3577b34da6a3ce929d0e0e4736';
+
+        $manager = $this->app->make(CorrelationIdManager::class);
+        $manager->set($traceId);
+
+        $middleware = new CorrelationIdRequestMiddleware(
+            $manager,
+            new TraceparentGenerator
+        );
+
+        $request = new Request(
+            'GET',
+            'https://example.com'
+        );
+
+        $request = $middleware($request);
+
+        $this->assertSame(
+            $traceId,
+            $request->getHeaderLine('X-Correlation-ID')
+        );
+
+        $this->assertFalse(
+            $request->hasHeader('traceparent')
+        );
+    }
+
+    public function test_it_does_not_modify_request_when_http_client_propagation_is_disabled(): void
     {
         config()->set(
             'correlation-id.http_client.enabled',
             false
         );
 
-        Http::fake();
+        $manager = $this->app->make(CorrelationIdManager::class);
+        $manager->set('client-correlation-id');
 
-        $manager = $this->app->make(
-            CorrelationIdManager::class
+        $middleware = new CorrelationIdRequestMiddleware(
+            $manager,
+            new TraceparentGenerator
         );
 
-        $manager->set('abc-123');
+        $request = new Request(
+            'GET',
+            'https://example.com'
+        );
 
-        Http::get('https://example.test');
+        $request = $middleware($request);
 
-        Http::assertSent(function (Request $request) {
-            return ! $request->hasHeader(
-                'X-Correlation-ID'
-            );
-        });
+        $this->assertFalse(
+            $request->hasHeader('X-Correlation-ID')
+        );
+
+        $this->assertFalse(
+            $request->hasHeader('traceparent')
+        );
     }
 
-    public function test_it_uses_custom_header_for_outgoing_requests(): void
+    public function test_it_does_not_modify_request_without_active_correlation_id(): void
     {
-        config()->set(
-            'correlation-id.header',
-            'X-Request-ID'
+        $manager = $this->app->make(CorrelationIdManager::class);
+        $manager->clear();
+
+        $middleware = new CorrelationIdRequestMiddleware(
+            $manager,
+            new TraceparentGenerator
         );
 
-        Http::fake();
-
-        $manager = $this->app->make(
-            CorrelationIdManager::class
+        $request = new Request(
+            'GET',
+            'https://example.com'
         );
 
-        $manager->set('abc-123');
+        $request = $middleware($request);
 
-        Http::get('https://example.test');
+        $this->assertFalse(
+            $request->hasHeader('X-Correlation-ID')
+        );
 
-        Http::assertSent(function (Request $request) {
-            return $request->hasHeader(
-                'X-Request-ID',
-                'abc-123'
-            );
-        });
+        $this->assertFalse(
+            $request->hasHeader('traceparent')
+        );
     }
 }

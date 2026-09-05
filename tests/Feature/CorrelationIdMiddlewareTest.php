@@ -4,6 +4,7 @@ namespace LaravelCorrelationId\Tests\Feature;
 
 use Illuminate\Support\Facades\Route;
 use LaravelCorrelationId\Tests\TestCase;
+use LaravelCorrelationId\CorrelationIdManager;
 
 class CorrelationIdMiddlewareTest extends TestCase
 {
@@ -14,6 +15,11 @@ class CorrelationIdMiddlewareTest extends TestCase
                 return response()->json([
                     'message' => 'ok',
                 ]);
+            });
+
+        Route::middleware('correlation-id')
+            ->get('/test-exception', function () {
+                throw new \RuntimeException('Test exception');
             });
     }
 
@@ -87,6 +93,46 @@ class CorrelationIdMiddlewareTest extends TestCase
         $this->assertNotSame(
             'invalid correlation id',
             $generatedId
+        );
+    }
+    public function test_it_clears_correlation_id_after_request(): void
+    {
+        $manager = $this->app->make(
+            CorrelationIdManager::class
+        );
+
+        $this
+            ->withHeader('X-Correlation-ID', 'abc-123')
+            ->get('/test')
+            ->assertOk();
+
+        $this->assertFalse(
+            $manager->has()
+        );
+    }
+
+
+    public function test_it_clears_correlation_id_when_request_throws_exception(): void
+    {
+        $this->withoutExceptionHandling();
+
+        $manager = $this->app->make(
+            CorrelationIdManager::class
+        );
+
+        try {
+            $this
+                ->withHeader('X-Correlation-ID', 'abc-123')
+                ->get('/test-exception');
+        } catch (\RuntimeException $exception) {
+            $this->assertSame(
+                'Test exception',
+                $exception->getMessage()
+            );
+        }
+
+        $this->assertFalse(
+            $manager->has()
         );
     }
 }

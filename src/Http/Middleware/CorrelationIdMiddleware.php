@@ -37,13 +37,17 @@ class CorrelationIdMiddleware
 
         $this->manager->set($correlationId);
 
-        $response = $next($request);
+        try {
+            $response = $next($request);
 
-        $response->headers->set(
-            $header,
-            $correlationId
-        );
+            $response->headers->set(
+                $header,
+                $correlationId
+            );
 
-        return $response;
+            return $response;
+        } finally {
+            $this->manager->clear();
+        }
     }
 }

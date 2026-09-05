@@ -11,16 +11,26 @@ class TraceparentParser
         }
 
         if (! preg_match(
-            '/^[\da-f]{2}-([\da-f]{32})-[\da-f]{16}-[\da-f]{2}$/i',
+            '/^([\da-f]{2})-([\da-f]{32})-([\da-f]{16})-([\da-f]{2})$/i',
             $traceparent,
             $matches
         )) {
             return null;
         }
 
-        $traceId = strtolower($matches[1]);
+        $version = strtolower($matches[1]);
+        $traceId = strtolower($matches[2]);
+        $parentId = strtolower($matches[3]);
+
+        if ($version === 'ff') {
+            return null;
+        }
 
         if ($traceId === str_repeat('0', 32)) {
+            return null;
+        }
+
+        if ($parentId === str_repeat('0', 16)) {
             return null;
         }
 

@@ -11,6 +11,9 @@ use Illuminate\Log\LogManager;
 use LaravelCorrelationId\Logging\CorrelationIdProcessor;
 use Illuminate\Support\Facades\Http;
 use LaravelCorrelationId\Http\CorrelationIdRequestMiddleware;
+use Illuminate\Contracts\Debug\ExceptionHandler;
+use LaravelCorrelationId\Exceptions\CorrelationIdExceptionResponse;
+
 
 class CorrelationIdServiceProvider extends ServiceProvider
 {
@@ -48,6 +51,23 @@ class CorrelationIdServiceProvider extends ServiceProvider
         $this->app->booted(function (): void {
             $this->registerLogProcessor();
         });
+
+        $this->app->afterResolving(
+            ExceptionHandler::class,
+            function (ExceptionHandler $handler): void {
+                if (! method_exists($handler, 'respondUsing')) {
+                    return;
+                }
+
+                $handler->respondUsing(
+                    function ($response, $exception, $request) {
+                        return $this->app
+                            ->make(CorrelationIdExceptionResponse::class)
+                            ->addHeader($request, $response);
+                    }
+                );
+            }
+        );
     }
     protected function registerLOgProcessor(): void
     {

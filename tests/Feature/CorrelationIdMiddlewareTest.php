@@ -173,29 +173,29 @@ class CorrelationIdMiddlewareTest extends TestCase
 
 
     public function test_it_uses_configured_request_attribute_name(): void
-{
-    config()->set(
-        'correlation-id.request_attribute',
-        'request_id'
-    );
+    {
+        config()->set(
+            'correlation-id.request_attribute',
+            'request_id'
+        );
 
-    Route::middleware('correlation-id')
-        ->get('/test-custom-attribute', function (Request $request) {
-            return response()->json([
-                'request_id' => $request->attributes->get(
-                    'request_id'
-                ),
-            ]);
-        });
+        Route::middleware('correlation-id')
+            ->get('/test-custom-attribute', function (Request $request) {
+                return response()->json([
+                    'request_id' => $request->attributes->get(
+                        'request_id'
+                    ),
+                ]);
+            });
 
-    $response = $this
-        ->withHeader('X-Correlation-ID', 'abc-123')
-        ->get('/test-custom-attribute');
+        $response = $this
+            ->withHeader('X-Correlation-ID', 'abc-123')
+            ->get('/test-custom-attribute');
 
-    $response->assertOk();
+        $response->assertOk();
 
-    $response->assertJson([
-        'request_id' => 'abc-123',
-    ]);
-}
+        $response->assertJson([
+            'request_id' => 'abc-123',
+        ]);
+    }
 }

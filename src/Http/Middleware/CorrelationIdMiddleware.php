@@ -18,7 +18,13 @@ class CorrelationIdMiddleware
 
     public function handle(Request $request, Closure $next): Response
     {
-        $correlationId = $request->header('X-Correlation-ID');
+        $header = config('correlation-id.header', 'X-Correlation-ID');
+
+        $correlationId = null;
+
+        if (config('correlation-id.trust_incoming', true)) {
+            $correlationId = $request->header($header);
+        }
 
         if (! $correlationId) {
             $correlationId = $this->generator->generate();
@@ -29,7 +35,7 @@ class CorrelationIdMiddleware
         $response = $next($request);
 
         $response->headers->set(
-            'X-Correlation-ID',
+            $header,
             $correlationId
         );
 

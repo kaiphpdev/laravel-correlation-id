@@ -11,6 +11,11 @@ class CorrelationIdServiceProvider extends ServiceProvider
 {
     public function register(): void
     {
+        $this->mergeConfigFrom(
+            __DIR__ . '/../config/correlation-id.php',
+            'correlation-id'
+        );
+
         $this->app->singleton(CorrelationIdManager::class);
 
         $this->app->bind(
@@ -25,5 +30,9 @@ class CorrelationIdServiceProvider extends ServiceProvider
             'correlation-id',
             CorrelationIdMiddleware::class
         );
+        $this->publishes([
+            __DIR__ . '/../config/correlation-id.php'
+            => config_path('correlation-id.php'),
+        ], 'correlation-id-config');
     }
 }

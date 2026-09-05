@@ -20,8 +20,6 @@ use LaravelCorrelationId\Logging\CorrelationIdProcessor;
 use LaravelCorrelationId\Queue\ClearCorrelationId;
 use LaravelCorrelationId\Queue\RestoreCorrelationId;
 
-use Illuminate\Foundation\Exceptions\Handler;
-
 class CorrelationIdServiceProvider extends ServiceProvider
 {
     public function register(): void

@@ -216,7 +216,6 @@ class CorrelationIdMiddlewareTest extends TestCase
         );
     }
 
-
     public function test_exception_response_uses_configured_header(): void
     {
         config()->set(

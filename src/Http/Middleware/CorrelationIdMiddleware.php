@@ -19,6 +19,8 @@ class CorrelationIdMiddleware
 
     public function handle(Request $request, Closure $next): Response
     {
+        $this->manager->clear();
+
         $header = config(
             'correlation-id.header',
             'X-Correlation-ID'

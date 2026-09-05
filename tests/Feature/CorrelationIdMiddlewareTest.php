@@ -259,4 +259,44 @@ class CorrelationIdMiddlewareTest extends TestCase
             $correlationId
         );
     }
+
+    public function test_it_clears_stale_correlation_id_before_processing_request(): void
+    {
+        $manager = $this->app->make(CorrelationIdManager::class);
+
+        $manager->set('stale-id');
+
+        $response = $this
+            ->withHeader(
+                'X-Correlation-ID',
+                'current-id'
+            )->get('/test-request-attribute');
+
+        $response->assertOk();
+        $response->assertJson([
+            'correlation_id' => 'current-id',
+        ]);
+
+        $this->assertFalse(
+            $manager->has()
+        );
+    }
+
+    public function test_stale_id_is_not_reused_when_new_request_has_no_header(): void
+    {
+
+        $manager = $this->app->make(CorrelationIdManager::class);
+        $manager->set('stale-id');
+
+        $response = $this->get('/test-request-attribute');
+
+        $response->assertOk();
+
+        $generatedId = $response->json('correlation_id');
+
+        $this->assertNotNull($generatedId);
+        $this->assertNotSame('stale-id', $generatedId);
+
+        $this->assertFalse($manager->has());
+    }
 }

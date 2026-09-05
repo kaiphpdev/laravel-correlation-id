@@ -6,7 +6,7 @@ Thank you for considering contributing to Laravel Correlation ID.
 
 Clone the repository and install dependencies:
 
-```bash
+``` bash
 composer install
 ```
 
@@ -14,27 +14,27 @@ composer install
 
 Before submitting a pull request, run:
 
-```bash
+``` bash
 composer check
 ```
 
 This verifies:
 
-- Composer configuration
-- code formatting
-- automated tests
+-   Composer configuration
+-   code formatting
+-   automated tests
 
 To run checks individually:
 
-```bash
-composer validate
+``` bash
+composer validate --strict
 composer format-check
 composer test
 ```
 
 To automatically format the code:
 
-```bash
+``` bash
 composer format
 ```
 
@@ -44,7 +44,8 @@ New functionality should include appropriate automated tests.
 
 Bug fixes should include a regression test whenever practical.
 
-The package uses PHPUnit and Orchestra Testbench for Laravel integration testing.
+The package uses PHPUnit and Orchestra Testbench for Laravel integration
+testing.
 
 ## Pull Requests
 
@@ -52,11 +53,11 @@ Keep pull requests focused on one clear change.
 
 Please:
 
-- explain what the change does
-- explain why the change is needed
-- add or update tests
-- update documentation when behavior changes
-- make sure `composer check` passes
+-   explain what the change does
+-   explain why the change is needed
+-   add or update tests
+-   update documentation when behavior changes
+-   make sure `composer check` passes
 
 ## Coding Style
 
@@ -64,7 +65,7 @@ The project uses Laravel Pint with the Laravel preset.
 
 Run:
 
-```bash
+``` bash
 composer format
 ```
 
@@ -76,7 +77,7 @@ Use clear commit messages.
 
 Examples:
 
-```text
+``` text
 feat: add correlation ID facade
 fix: clear correlation ID after queue failure
 test: add queue payload coverage
@@ -88,12 +89,13 @@ ci: update compatibility matrix
 
 ## Backward Compatibility
 
-Avoid breaking public APIs unless the change is planned for a new major version.
+Avoid breaking public APIs unless the change is planned for a new major
+version.
 
 Public behavior includes:
 
-- configuration keys
-- public classes and contracts
-- middleware aliases
-- facade methods
-- documented package behavior
+-   configuration keys
+-   public classes and contracts
+-   middleware aliases
+-   facade methods
+-   documented package behavior

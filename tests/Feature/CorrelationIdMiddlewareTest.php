@@ -135,4 +135,18 @@ class CorrelationIdMiddlewareTest extends TestCase
             $manager->has()
         );
     }
+
+    public function test_exception_response_contains_correlation_id(): void
+    {
+        $response = $this
+            ->withHeader('X-Correlation-ID', 'abc-123')
+            ->get('/test-exception');
+
+        $response->assertStatus(500);
+
+        $response->assertHeader(
+            'X-Correlation-ID',
+            'abc-123'
+        );
+    }
 }

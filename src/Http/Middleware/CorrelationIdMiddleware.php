@@ -19,7 +19,10 @@ class CorrelationIdMiddleware
 
     public function handle(Request $request, Closure $next): Response
     {
-        $header = config('correlation-id.header', 'X-Correlation-ID');
+        $header = config(
+            'correlation-id.header',
+            'X-Correlation-ID'
+        );
 
         $correlationId = null;
 

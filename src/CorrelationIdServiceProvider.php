@@ -12,7 +12,6 @@ use LaravelCorrelationId\Logging\CorrelationIdProcessor;
 use Illuminate\Support\Facades\Http;
 use LaravelCorrelationId\Http\CorrelationIdRequestMiddleware;
 
-
 class CorrelationIdServiceProvider extends ServiceProvider
 {
     public function register(): void

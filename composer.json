@@ -1,0 +1,34 @@
+{
+    "name": "kaiphpdev/laravel-correlation-id",
+    "description": "Lightweight end-to-end correlation ID tracing for Laravel applications.",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Kai"
+        }
+    ],
+    "require": {
+        "php": "^8.2",
+        "illuminate/support": "^11.0|^12.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "LaravelCorrelationId\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "LaravelCorrelationId\\Tests\\": "tests/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "LaravelCorrelationId\\CorrelationIdServiceProvider"
+            ]
+        }
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true
+}

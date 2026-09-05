@@ -6,7 +6,6 @@ use LaravelCorrelationId\CorrelationIdManager;
 use LaravelCorrelationId\Facades\CorrelationId;
 use LaravelCorrelationId\Tests\TestCase;
 
-
 class CorrelationIdFacadeTest extends TestCase
 {
     public function test_facade_returns_current_correlation_id(): void
@@ -17,6 +16,7 @@ class CorrelationIdFacadeTest extends TestCase
 
         $this->assertSame('abc-123', CorrelationId::get());
     }
+
     public function test_facade_can_check_if_correlation_id_exists(): void
     {
         $this->assertFalse(

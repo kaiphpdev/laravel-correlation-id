@@ -3,21 +3,18 @@
 namespace LaravelCorrelationId\Tests\Unit;
 
 use Illuminate\Contracts\Queue\Job;
+use Illuminate\Queue\Events\JobExceptionOccurred;
 use Illuminate\Queue\Events\JobProcessed;
 use LaravelCorrelationId\CorrelationIdManager;
 use LaravelCorrelationId\Queue\ClearCorrelationId;
 use PHPUnit\Framework\TestCase;
-
-use Illuminate\Queue\Events\JobExceptionOccurred;
 use RuntimeException;
-
-
 
 class ClearCorrelationIdTest extends TestCase
 {
     public function test_it_clears_correlation_id_after_job_is_processed(): void
     {
-        $manager = new CorrelationIdManager();
+        $manager = new CorrelationIdManager;
 
         $manager->set('abc-123');
 
@@ -38,9 +35,10 @@ class ClearCorrelationIdTest extends TestCase
             $manager->has()
         );
     }
+
     public function test_it_clears_correlation_id_after_job_exception(): void
     {
-        $manager = new CorrelationIdManager();
+        $manager = new CorrelationIdManager;
 
         $manager->set('abc-123');
 

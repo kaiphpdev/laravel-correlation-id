@@ -4,10 +4,10 @@ namespace LaravelCorrelationId\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
-use LaravelCorrelationId\CorrelationIdManager;
 use LaravelCorrelationId\Contracts\CorrelationIdGenerator;
-use Symfony\Component\HttpFoundation\Response;
+use LaravelCorrelationId\CorrelationIdManager;
 use LaravelCorrelationId\Validation\CorrelationIdValidator;
+use Symfony\Component\HttpFoundation\Response;
 
 class CorrelationIdMiddleware
 {

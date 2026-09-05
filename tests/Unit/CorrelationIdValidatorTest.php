@@ -9,7 +9,7 @@ class CorrelationIdValidatorTest extends TestCase
 {
     public function test_it_accepts_a_valid_correlation_id(): void
     {
-        $validator = new CorrelationIdValidator();
+        $validator = new CorrelationIdValidator;
 
         $this->assertTrue(
             $validator->isValid('abc-123')
@@ -18,7 +18,7 @@ class CorrelationIdValidatorTest extends TestCase
 
     public function test_it_rejects_an_empty_correlation_id(): void
     {
-        $validator = new CorrelationIdValidator();
+        $validator = new CorrelationIdValidator;
 
         $this->assertFalse(
             $validator->isValid('')
@@ -32,7 +32,7 @@ class CorrelationIdValidatorTest extends TestCase
             10
         );
 
-        $validator = new CorrelationIdValidator();
+        $validator = new CorrelationIdValidator;
 
         $this->assertFalse(
             $validator->isValid('12345678901')
@@ -41,7 +41,7 @@ class CorrelationIdValidatorTest extends TestCase
 
     public function test_it_rejects_invalid_characters(): void
     {
-        $validator = new CorrelationIdValidator();
+        $validator = new CorrelationIdValidator;
 
         $this->assertFalse(
             $validator->isValid('abc 123')
@@ -55,7 +55,7 @@ class CorrelationIdValidatorTest extends TestCase
             '/^[0-9]+$/'
         );
 
-        $validator = new CorrelationIdValidator();
+        $validator = new CorrelationIdValidator;
 
         $this->assertTrue(
             $validator->isValid('123456')

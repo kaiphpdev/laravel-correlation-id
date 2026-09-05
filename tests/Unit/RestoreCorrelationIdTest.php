@@ -6,8 +6,8 @@ use Illuminate\Contracts\Queue\Job;
 use Illuminate\Queue\Events\JobProcessing;
 use LaravelCorrelationId\CorrelationIdManager;
 use LaravelCorrelationId\Queue\RestoreCorrelationId;
-use Orchestra\Testbench\TestCase;
 use LaravelCorrelationId\Validation\CorrelationIdValidator;
+use Orchestra\Testbench\TestCase;
 
 class RestoreCorrelationIdTest extends TestCase
 {
@@ -21,10 +21,10 @@ class RestoreCorrelationIdTest extends TestCase
             ]);
 
         $event = new JobProcessing('database', $job);
-        $manager = new CorrelationIdManager();
+        $manager = new CorrelationIdManager;
         $listener = new RestoreCorrelationId(
             $manager,
-            new CorrelationIdValidator()
+            new CorrelationIdValidator
         );
         $listener->handle($event);
         $this->assertSame('abc-123', $manager->get());
@@ -49,11 +49,11 @@ class RestoreCorrelationIdTest extends TestCase
             $job
         );
 
-        $manager = new CorrelationIdManager();
+        $manager = new CorrelationIdManager;
 
         $listener = new RestoreCorrelationId(
             $manager,
-            new CorrelationIdValidator()
+            new CorrelationIdValidator
         );
 
         $listener->handle($event);
@@ -75,13 +75,13 @@ class RestoreCorrelationIdTest extends TestCase
             $job
         );
 
-        $manager = new CorrelationIdManager();
+        $manager = new CorrelationIdManager;
 
         $manager->set('old-id');
 
         $listener = new RestoreCorrelationId(
             $manager,
-            new CorrelationIdValidator()
+            new CorrelationIdValidator
         );
 
         $listener->handle($event);
@@ -110,11 +110,11 @@ class RestoreCorrelationIdTest extends TestCase
             $job
         );
 
-        $manager = new CorrelationIdManager();
+        $manager = new CorrelationIdManager;
 
         $listener = new RestoreCorrelationId(
             $manager,
-            new CorrelationIdValidator()
+            new CorrelationIdValidator
         );
 
         $listener->handle($event);
@@ -124,6 +124,7 @@ class RestoreCorrelationIdTest extends TestCase
             $manager->get()
         );
     }
+
     public function test_it_does_not_restore_invalid_correlation_id(): void
     {
         $job = $this->createMock(Job::class);
@@ -138,11 +139,11 @@ class RestoreCorrelationIdTest extends TestCase
             $job
         );
 
-        $manager = new CorrelationIdManager();
+        $manager = new CorrelationIdManager;
 
         $listener = new RestoreCorrelationId(
             $manager,
-            new CorrelationIdValidator()
+            new CorrelationIdValidator
         );
 
         $listener->handle($event);

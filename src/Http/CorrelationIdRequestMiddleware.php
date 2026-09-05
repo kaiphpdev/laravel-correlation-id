@@ -9,8 +9,7 @@ class CorrelationIdRequestMiddleware
 {
     public function __construct(
         protected CorrelationIdManager $manager
-    ) {
-    }
+    ) {}
 
     public function __invoke(RequestInterface $request): RequestInterface
     {

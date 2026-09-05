@@ -10,7 +10,7 @@ class UuidGeneratorTest extends TestCase
 {
     public function test_it_generates_a_valid_uuid(): void
     {
-        $generator = new UuidGenerator();
+        $generator = new UuidGenerator;
 
         $correlationId = $generator->generate();
 

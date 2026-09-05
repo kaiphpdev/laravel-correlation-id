@@ -2,13 +2,13 @@
 
 namespace LaravelCorrelationId\Tests\Feature;
 
-use LaravelCorrelationId\CorrelationIdManager;
-use LaravelCorrelationId\Contracts\CorrelationIdGenerator;
-use LaravelCorrelationId\Generators\UuidGenerator;
-use LaravelCorrelationId\Tests\TestCase;
-use LaravelCorrelationId\Tests\Fixtures\CustomGenerator;
 use InvalidArgumentException;
+use LaravelCorrelationId\Contracts\CorrelationIdGenerator;
+use LaravelCorrelationId\CorrelationIdManager;
+use LaravelCorrelationId\Generators\UuidGenerator;
+use LaravelCorrelationId\Tests\Fixtures\CustomGenerator;
 use LaravelCorrelationId\Tests\Fixtures\InvalidGenerator;
+use LaravelCorrelationId\Tests\TestCase;
 
 class ServiceContainerTest extends TestCase
 {
@@ -39,6 +39,7 @@ class ServiceContainerTest extends TestCase
             $generator
         );
     }
+
     public function test_custom_generator_can_be_configured(): void
     {
         config()->set(

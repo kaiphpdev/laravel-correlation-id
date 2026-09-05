@@ -14,7 +14,8 @@
     },
     "require-dev": {
         "orchestra/testbench": "^9.0|^10.0",
-        "phpunit/phpunit": "^11.0"
+        "phpunit/phpunit": "^11.0",
+        "laravel/pint": "^1.30"
     },
     "autoload": {
         "psr-4": {
@@ -25,6 +26,17 @@
         "psr-4": {
             "LaravelCorrelationId\\Tests\\": "tests/"
         }
+    },
+    "scripts": {
+        "test": "phpunit",
+        "format": "pint",
+        "format-check": "pint --test",
+        "validate": "composer validate --strict",
+        "check": [
+            "@validate",
+            "@format-check",
+            "@test"
+        ]
     },
     "extra": {
         "laravel": {

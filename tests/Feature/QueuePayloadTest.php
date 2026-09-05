@@ -26,7 +26,7 @@ class QueuePayloadTest extends TestCase
         $manager->set('abc-123');
 
         $payload = $this->createQueuePayload(
-            new TestJob()
+            new TestJob
         );
 
         $this->assertSame(
@@ -38,7 +38,7 @@ class QueuePayloadTest extends TestCase
     public function test_it_does_not_add_correlation_id_when_none_exists(): void
     {
         $payload = $this->createQueuePayload(
-            new TestJob()
+            new TestJob
         );
 
         $this->assertArrayNotHasKey(
@@ -61,7 +61,7 @@ class QueuePayloadTest extends TestCase
         $manager->set('abc-123');
 
         $payload = $this->createQueuePayload(
-            new TestJob()
+            new TestJob
         );
 
         $this->assertArrayNotHasKey(
@@ -84,7 +84,7 @@ class QueuePayloadTest extends TestCase
         $manager->set('abc-123');
 
         $payload = $this->createQueuePayload(
-            new TestJob()
+            new TestJob
         );
 
         $this->assertSame(

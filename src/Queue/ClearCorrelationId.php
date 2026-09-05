@@ -6,7 +6,6 @@ use Illuminate\Queue\Events\JobExceptionOccurred;
 use Illuminate\Queue\Events\JobProcessed;
 use LaravelCorrelationId\CorrelationIdManager;
 
-
 class ClearCorrelationId
 {
     public function __construct(

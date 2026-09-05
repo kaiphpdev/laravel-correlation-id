@@ -29,7 +29,9 @@ class RestoreCorrelationId
 
         $correlationId = $payload[$key] ?? null;
 
-        if (!$this->validator->isValid($correlationId)) return;
+        if (! $this->validator->isValid($correlationId)) {
+            return;
+        }
 
         $this->manager->set($correlationId);
     }

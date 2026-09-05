@@ -2,11 +2,11 @@
 
 namespace LaravelCorrelationId\Tests\Feature;
 
-use Illuminate\Support\Facades\Route;
-use LaravelCorrelationId\Tests\TestCase;
-use LaravelCorrelationId\CorrelationIdManager;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Route;
+use LaravelCorrelationId\CorrelationIdManager;
 use LaravelCorrelationId\Tests\Fixtures\CustomGenerator;
+use LaravelCorrelationId\Tests\TestCase;
 
 class CorrelationIdMiddlewareTest extends TestCase
 {
@@ -27,7 +27,7 @@ class CorrelationIdMiddlewareTest extends TestCase
         Route::middleware('correlation-id')
             ->get('/test-request-attribute', function (Request $request) {
                 return response()->json([
-                    'correlation_id' => $request->attributes->get('correlation_id')
+                    'correlation_id' => $request->attributes->get('correlation_id'),
                 ]);
             });
     }
@@ -104,6 +104,7 @@ class CorrelationIdMiddlewareTest extends TestCase
             $generatedId
         );
     }
+
     public function test_it_clears_correlation_id_after_request(): void
     {
         $manager = $this->app->make(
@@ -119,7 +120,6 @@ class CorrelationIdMiddlewareTest extends TestCase
             $manager->has()
         );
     }
-
 
     public function test_it_clears_correlation_id_when_request_throws_exception(): void
     {
@@ -172,7 +172,6 @@ class CorrelationIdMiddlewareTest extends TestCase
         ]);
     }
 
-
     public function test_it_uses_configured_request_attribute_name(): void
     {
         config()->set(
@@ -199,6 +198,7 @@ class CorrelationIdMiddlewareTest extends TestCase
             'request_id' => 'abc-123',
         ]);
     }
+
     public function test_it_uses_configured_generator_when_creating_new_id(): void
     {
         config()->set(

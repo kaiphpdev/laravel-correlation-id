@@ -7,7 +7,8 @@ use Symfony\Component\HttpFoundation\Response;
 
 class CorrelationIdExceptionResponse
 {
-    public function addHeader(Request $request, Response $response): Response {
+    public function addHeader(Request $request, Response $response): Response
+    {
         $attribute = config(
             'correlation-id.request_attribute',
             'correlation_id'
@@ -15,13 +16,14 @@ class CorrelationIdExceptionResponse
 
         $correlationId = $request->attributes->get($attribute);
 
-        if(!is_string($correlationId) || $correlationId === ''){
+        if (! is_string($correlationId) || $correlationId === '') {
             return $response;
         }
 
         $header = config('correlation-id.header', 'X-Correlation-ID');
 
         $response->headers->set($header, $correlationId);
+
         return $response;
     }
 }

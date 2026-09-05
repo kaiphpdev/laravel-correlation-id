@@ -13,14 +13,14 @@ class CorrelationIdProcessorTest extends TestCase
 {
     public function test_it_adds_correlation_id_to_log_record(): void
     {
-        $manager = new CorrelationIdManager();
+        $manager = new CorrelationIdManager;
 
         $manager->set('abc-123');
 
         $processor = new CorrelationIdProcessor($manager);
 
         $record = new LogRecord(
-            datetime: new DateTimeImmutable(),
+            datetime: new DateTimeImmutable,
             channel: 'testing',
             level: Level::Info,
             message: 'Test message'
@@ -34,15 +34,14 @@ class CorrelationIdProcessorTest extends TestCase
         );
     }
 
-
     public function test_it_does_not_modify_record_when_id_is_missing(): void
     {
-        $manager = new CorrelationIdManager();
+        $manager = new CorrelationIdManager;
 
         $processor = new CorrelationIdProcessor($manager);
 
         $record = new LogRecord(
-            datetime: new DateTimeImmutable(),
+            datetime: new DateTimeImmutable,
             channel: 'testing',
             level: Level::Info,
             message: 'Test message'
@@ -55,6 +54,7 @@ class CorrelationIdProcessorTest extends TestCase
             $processedRecord->extra
         );
     }
+
     public function test_it_does_not_add_id_when_logging_is_disabled(): void
     {
         config()->set(
@@ -62,14 +62,14 @@ class CorrelationIdProcessorTest extends TestCase
             false
         );
 
-        $manager = new CorrelationIdManager();
+        $manager = new CorrelationIdManager;
 
         $manager->set('abc-123');
 
         $processor = new CorrelationIdProcessor($manager);
 
         $record = new LogRecord(
-            datetime: new DateTimeImmutable(),
+            datetime: new DateTimeImmutable,
             channel: 'testing',
             level: Level::Info,
             message: 'Test message'
@@ -90,14 +90,14 @@ class CorrelationIdProcessorTest extends TestCase
             'request_id'
         );
 
-        $manager = new CorrelationIdManager();
+        $manager = new CorrelationIdManager;
 
         $manager->set('abc-123');
 
         $processor = new CorrelationIdProcessor($manager);
 
         $record = new LogRecord(
-            datetime: new DateTimeImmutable(),
+            datetime: new DateTimeImmutable,
             channel: 'testing',
             level: Level::Info,
             message: 'Test message'

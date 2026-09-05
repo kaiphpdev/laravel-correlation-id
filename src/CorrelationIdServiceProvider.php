@@ -2,33 +2,30 @@
 
 namespace LaravelCorrelationId;
 
-use Illuminate\Support\ServiceProvider;
-use LaravelCorrelationId\Contracts\CorrelationIdGenerator;
-use LaravelCorrelationId\Generators\UuidGenerator;
-use LaravelCorrelationId\Http\Middleware\CorrelationIdMiddleware;
-
-use Illuminate\Log\LogManager;
-use LaravelCorrelationId\Logging\CorrelationIdProcessor;
-use Illuminate\Support\Facades\Http;
-use LaravelCorrelationId\Http\CorrelationIdRequestMiddleware;
 use Illuminate\Contracts\Debug\ExceptionHandler;
-use LaravelCorrelationId\Exceptions\CorrelationIdExceptionResponse;
-use Illuminate\Queue\Queue;
-
+use Illuminate\Log\LogManager;
 use Illuminate\Queue\Events\JobExceptionOccurred;
 use Illuminate\Queue\Events\JobProcessed;
 use Illuminate\Queue\Events\JobProcessing;
+use Illuminate\Queue\Queue;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\ServiceProvider;
+use LaravelCorrelationId\Contracts\CorrelationIdGenerator;
+use LaravelCorrelationId\Exceptions\CorrelationIdExceptionResponse;
+use LaravelCorrelationId\Generators\UuidGenerator;
+use LaravelCorrelationId\Http\CorrelationIdRequestMiddleware;
+use LaravelCorrelationId\Http\Middleware\CorrelationIdMiddleware;
+use LaravelCorrelationId\Logging\CorrelationIdProcessor;
 use LaravelCorrelationId\Queue\ClearCorrelationId;
 use LaravelCorrelationId\Queue\RestoreCorrelationId;
-
 
 class CorrelationIdServiceProvider extends ServiceProvider
 {
     public function register(): void
     {
         $this->mergeConfigFrom(
-            __DIR__ . '/../config/correlation-id.php',
+            __DIR__.'/../config/correlation-id.php',
             'correlation-id'
         );
 
@@ -71,8 +68,7 @@ class CorrelationIdServiceProvider extends ServiceProvider
         );
 
         $this->publishes([
-            __DIR__ . '/../config/correlation-id.php'
-            => config_path('correlation-id.php'),
+            __DIR__.'/../config/correlation-id.php' => config_path('correlation-id.php'),
         ], 'correlation-id-config');
 
         $this->app->booted(function (): void {
@@ -105,7 +101,9 @@ class CorrelationIdServiceProvider extends ServiceProvider
                 CorrelationIdManager::class
             );
 
-            if (! $manager->has()) return [];
+            if (! $manager->has()) {
+                return [];
+            }
 
             $key = config(
                 'correlation-id.queue.payload_key',
@@ -132,10 +130,10 @@ class CorrelationIdServiceProvider extends ServiceProvider
             [ClearCorrelationId::class, 'handleException']
         );
     }
+
     protected function registerLOgProcessor(): void
     {
         $logManager = $this->app->make(LogManager::class);
-
 
         $processor = $this->app->make(CorrelationIdProcessor::class);
 

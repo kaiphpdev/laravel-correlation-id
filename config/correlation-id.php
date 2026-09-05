@@ -1,9 +1,11 @@
 <?php
 
+use LaravelCorrelationId\Generators\UuidGenerator;
+
 return [
     'header' => 'X-Correlation-ID',
     'request_attribute' => 'correlation_id',
-    'generator' => \LaravelCorrelationId\Generators\UuidGenerator::class,
+    'generator' => UuidGenerator::class,
     'trust_incoming' => true,
 
     'incoming' => [

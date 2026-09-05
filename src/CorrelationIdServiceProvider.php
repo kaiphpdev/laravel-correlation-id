@@ -7,6 +7,7 @@ use Illuminate\Support\ServiceProvider;
 class CorrelationIdServiceProvider extends ServiceProvider{
     public function register(): void
     {
+        $this->app->singleton(CorrelationIdManager::class);
         
     }
     public function boot(): void

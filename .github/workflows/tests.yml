@@ -14,15 +14,19 @@ jobs:
         include:
           - php: "8.2"
             laravel: "11.*"
+            allow-security-blocked: true
 
           - php: "8.3"
             laravel: "11.*"
+            allow-security-blocked: true
 
           - php: "8.3"
             laravel: "12.*"
+            allow-security-blocked: false
 
           - php: "8.4"
             laravel: "12.*"
+            allow-security-blocked: false
 
     name: PHP ${{ matrix.php }} - Laravel ${{ matrix.laravel }}
 
@@ -40,11 +44,15 @@ jobs:
       - name: Validate Composer
         run: composer validate --strict
 
+      - name: Allow advisory-blocked Laravel for compatibility test
+        if: matrix.allow-security-blocked == true
+        run: composer config audit.block-insecure false
+
       - name: Select Laravel version
         run: composer require "laravel/framework:${{ matrix.laravel }}" --no-interaction --no-update
 
       - name: Install dependencies
-        run: composer update --no-interaction --prefer-dist --no-progress
+        run: composer update --with-all-dependencies --no-interaction --prefer-dist --no-progress
 
       - name: Check code style
         run: composer format-check

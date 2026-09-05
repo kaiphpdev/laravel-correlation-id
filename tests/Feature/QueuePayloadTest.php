@@ -116,4 +116,87 @@ class QueuePayloadTest extends TestCase
             true
         );
     }
+
+    public function test_it_adds_trace_id_to_queue_payload_when_w3c_trace_exists(): void
+    {
+        config()->set('correlation-id.w3c.enabled', true);
+
+        $manager = $this->app->make(
+            CorrelationIdManager::class
+        );
+
+        $traceId = '4bf92f3577b34da6a3ce929d0e0e4736';
+
+        $manager->set($traceId);
+        $manager->setTraceId($traceId);
+
+        $payload = $this->createQueuePayload(
+            new TestJob
+        );
+
+        $this->assertSame(
+            $traceId,
+            $payload['correlation_id']
+        );
+
+        $this->assertSame(
+            $traceId,
+            $payload['trace_id']
+        );
+    }
+
+    public function test_it_does_not_add_trace_id_for_normal_correlation_id(): void
+    {
+        config()->set('correlation-id.w3c.enabled', true);
+
+        $manager = $this->app->make(
+            CorrelationIdManager::class
+        );
+
+        $manager->set(
+            'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
+        );
+
+        $payload = $this->createQueuePayload(
+            new TestJob
+        );
+
+        $this->assertArrayHasKey(
+            'correlation_id',
+            $payload
+        );
+
+        $this->assertArrayNotHasKey(
+            'trace_id',
+            $payload
+        );
+    }
+
+    public function test_it_uses_configured_trace_payload_key(): void
+    {
+        config()->set('correlation-id.w3c.enabled', true);
+
+        config()->set(
+            'correlation-id.queue.trace_payload_key',
+            'w3c_trace_id'
+        );
+
+        $manager = $this->app->make(
+            CorrelationIdManager::class
+        );
+
+        $traceId = '4bf92f3577b34da6a3ce929d0e0e4736';
+
+        $manager->set($traceId);
+        $manager->setTraceId($traceId);
+
+        $payload = $this->createQueuePayload(
+            new TestJob
+        );
+
+        $this->assertSame(
+            $traceId,
+            $payload['w3c_trace_id']
+        );
+    }
 }

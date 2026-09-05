@@ -2,11 +2,17 @@
 
 namespace LaravelCorrelationId\Tracing;
 
+use LaravelCorrelationId\Validation\TraceIdValidator;
+
 class TraceparentGenerator
 {
+    public function __construct(
+        protected TraceIdValidator $validator = new TraceIdValidator
+    ) {}
+
     public function generate(string $traceId): ?string
     {
-        if (! $this->isValidTraceId($traceId)) {
+        if (! $this->validator->isValid($traceId)) {
             return null;
         }
 
@@ -17,14 +23,5 @@ class TraceparentGenerator
             strtolower($traceId),
             $parentId
         );
-    }
-
-    private function isValidTraceId(string $traceId): bool
-    {
-        if (! preg_match('/^[\da-f]{32}$/i', $traceId)) {
-            return false;
-        }
-
-        return strtolower($traceId) !== str_repeat('0', 32);
     }
 }

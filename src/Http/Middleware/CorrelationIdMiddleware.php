@@ -29,14 +29,19 @@ class CorrelationIdMiddleware
         );
 
         $correlationId = null;
+        $traceId = null;
 
         if (
             config('correlation-id.w3c.enabled', false)
             && config('correlation-id.w3c.accept_traceparent', true)
         ) {
-            $correlationId = $this->traceparentParser->extractTraceId(
+            $traceId = $this->traceparentParser->extractTraceId(
                 $request->header('traceparent')
             );
+
+            if ($traceId !== null) {
+                $correlationId = $traceId;
+            }
         }
 
         if (! $correlationId && config('correlation-id.trust_incoming', true)) {
@@ -52,6 +57,10 @@ class CorrelationIdMiddleware
         }
 
         $this->manager->set($correlationId);
+
+        if ($traceId !== null) {
+            $this->manager->setTraceId($traceId);
+        }
 
         $attributes = config('correlation-id.request_attribute', 'correlation_id');
         $request->attributes->set($attributes, $correlationId);

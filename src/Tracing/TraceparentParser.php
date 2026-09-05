@@ -2,8 +2,14 @@
 
 namespace LaravelCorrelationId\Tracing;
 
+use LaravelCorrelationId\Validation\TraceIdValidator;
+
 class TraceparentParser
 {
+    public function __construct(
+        protected TraceIdValidator $traceIdValidator
+    ) {}
+
     public function extractTraceId(?string $traceparent): ?string
     {
         if (! is_string($traceparent) || $traceparent === '') {
@@ -26,7 +32,7 @@ class TraceparentParser
             return null;
         }
 
-        if ($traceId === str_repeat('0', 32)) {
+        if (! $this->traceIdValidator->isValid($traceId)) {
             return null;
         }
 

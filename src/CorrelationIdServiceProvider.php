@@ -105,14 +105,28 @@ class CorrelationIdServiceProvider extends ServiceProvider
                 return [];
             }
 
-            $key = config(
+            $payload = [];
+
+            $correlationKey = config(
                 'correlation-id.queue.payload_key',
                 'correlation_id'
             );
 
-            return [
-                $key => $manager->get(),
-            ];
+            $payload[$correlationKey] = $manager->get();
+
+            if (
+                config('correlation-id.w3c.enabled', false)
+                && $manager->hasTraceId()
+            ) {
+                $traceKey = config(
+                    'correlation-id.queue.trace_payload_key',
+                    'trace_id'
+                );
+
+                $payload[$traceKey] = $manager->getTraceId();
+            }
+
+            return $payload;
         });
 
         Event::listen(

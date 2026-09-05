@@ -38,9 +38,11 @@ class CorrelationIdRequestMiddleware
         if (
             config('correlation-id.w3c.enabled', false)
             && config('correlation-id.w3c.propagate_traceparent', true)
+            && $this->manager->hasTraceId()
         ) {
+
             $traceparent = $this->traceparentGenerator->generate(
-                $correlationId
+                $this->manager->getTraceId()
             );
 
             if ($traceparent !== null) {

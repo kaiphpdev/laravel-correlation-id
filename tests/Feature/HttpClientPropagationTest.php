@@ -44,7 +44,9 @@ class HttpClientPropagationTest extends TestCase
         $traceId = '4bf92f3577b34da6a3ce929d0e0e4736';
 
         $manager = $this->app->make(CorrelationIdManager::class);
+
         $manager->set($traceId);
+        $manager->setTraceId($traceId);
 
         $middleware = new CorrelationIdRequestMiddleware(
             $manager,

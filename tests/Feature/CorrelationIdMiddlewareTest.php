@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Route;
 use LaravelCorrelationId\Tests\TestCase;
 use LaravelCorrelationId\CorrelationIdManager;
 use Illuminate\Http\Request;
+use LaravelCorrelationId\Tests\Fixtures\CustomGenerator;
 
 class CorrelationIdMiddlewareTest extends TestCase
 {
@@ -197,5 +198,21 @@ class CorrelationIdMiddlewareTest extends TestCase
         $response->assertJson([
             'request_id' => 'abc-123',
         ]);
+    }
+    public function test_it_uses_configured_generator_when_creating_new_id(): void
+    {
+        config()->set(
+            'correlation-id.generator',
+            CustomGenerator::class
+        );
+
+        $response = $this->get('/test');
+
+        $response->assertOk();
+
+        $response->assertHeader(
+            'X-Correlation-ID',
+            'custom-id-123'
+        );
     }
 }

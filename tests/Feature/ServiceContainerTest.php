@@ -6,6 +6,9 @@ use LaravelCorrelationId\CorrelationIdManager;
 use LaravelCorrelationId\Contracts\CorrelationIdGenerator;
 use LaravelCorrelationId\Generators\UuidGenerator;
 use LaravelCorrelationId\Tests\TestCase;
+use LaravelCorrelationId\Tests\Fixtures\CustomGenerator;
+use InvalidArgumentException;
+use LaravelCorrelationId\Tests\Fixtures\InvalidGenerator;
 
 class ServiceContainerTest extends TestCase
 {
@@ -34,6 +37,47 @@ class ServiceContainerTest extends TestCase
         $this->assertInstanceOf(
             UuidGenerator::class,
             $generator
+        );
+    }
+    public function test_custom_generator_can_be_configured(): void
+    {
+        config()->set(
+            'correlation-id.generator',
+            CustomGenerator::class
+        );
+
+        $generator = $this->app->make(
+            CorrelationIdGenerator::class
+        );
+
+        $this->assertInstanceOf(
+            CustomGenerator::class,
+            $generator
+        );
+
+        $this->assertSame(
+            'custom-id-123',
+            $generator->generate()
+        );
+    }
+
+    public function test_invalid_generator_configuration_throws_exception(): void
+    {
+        config()->set(
+            'correlation-id.generator',
+            InvalidGenerator::class
+        );
+
+        $this->expectException(
+            InvalidArgumentException::class
+        );
+
+        $this->expectExceptionMessage(
+            'must implement'
+        );
+
+        $this->app->make(
+            CorrelationIdGenerator::class
         );
     }
 }

@@ -3,6 +3,7 @@
 return [
     'header' => 'X-Correlation-ID',
     'request_attribute' => 'correlation_id',
+    'generator' => \LaravelCorrelationId\Generators\UuidGenerator::class,
     'trust_incoming' => true,
 
     'incoming' => [

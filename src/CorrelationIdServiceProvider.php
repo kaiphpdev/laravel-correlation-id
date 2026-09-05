@@ -36,7 +36,26 @@ class CorrelationIdServiceProvider extends ServiceProvider
 
         $this->app->bind(
             CorrelationIdGenerator::class,
-            UuidGenerator::class
+            function ($app) {
+                $generator = config(
+                    'correlation-id.generator',
+                    UuidGenerator::class
+                );
+
+                $instance = $app->make($generator);
+
+                if (! $instance instanceof CorrelationIdGenerator) {
+                    throw new \InvalidArgumentException(
+                        sprintf(
+                            'Correlation ID generator [%s] must implement [%s].',
+                            $generator,
+                            CorrelationIdGenerator::class
+                        )
+                    );
+                }
+
+                return $instance;
+            }
         );
     }
 

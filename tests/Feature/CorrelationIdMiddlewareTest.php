@@ -215,4 +215,49 @@ class CorrelationIdMiddlewareTest extends TestCase
             'custom-id-123'
         );
     }
+
+
+    public function test_exception_response_uses_configured_header(): void
+    {
+        config()->set(
+            'correlation-id.header',
+            'X-Request-ID'
+        );
+
+        $response = $this
+            ->withHeader(
+                'X-Request-ID',
+                'abc-123'
+            )
+            ->get('/test-exception');
+
+        $response->assertStatus(500);
+
+        $response->assertHeader(
+            'X-Request-ID',
+            'abc-123'
+        );
+    }
+
+    public function test_exception_response_contains_generated_correlation_id(): void
+    {
+        $response = $this->get(
+            '/test-exception'
+        );
+
+        $response->assertStatus(500);
+
+        $correlationId = $response
+            ->headers
+            ->get('X-Correlation-ID');
+
+        $this->assertNotNull(
+            $correlationId
+        );
+
+        $this->assertNotSame(
+            '',
+            $correlationId
+        );
+    }
 }

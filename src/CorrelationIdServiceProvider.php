@@ -20,6 +20,8 @@ use LaravelCorrelationId\Logging\CorrelationIdProcessor;
 use LaravelCorrelationId\Queue\ClearCorrelationId;
 use LaravelCorrelationId\Queue\RestoreCorrelationId;
 
+use Illuminate\Foundation\Exceptions\Handler;
+
 class CorrelationIdServiceProvider extends ServiceProvider
 {
     public function register(): void
@@ -83,7 +85,7 @@ class CorrelationIdServiceProvider extends ServiceProvider
                 }
 
                 $handler->respondUsing(
-                    function ($response, $exception, $request) {
+                    function ($response, \Throwable $exception, $request) {
                         return $this->app
                             ->make(CorrelationIdExceptionResponse::class)
                             ->addHeader($request, $response);

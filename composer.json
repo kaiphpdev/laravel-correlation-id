@@ -30,7 +30,10 @@
         "laravel": {
             "providers": [
                 "LaravelCorrelationId\\CorrelationIdServiceProvider"
-            ]
+            ],
+            "aliases": {
+                "CorrelationId": "LaravelCorrelationId\\Facades\\CorrelationId"
+            }
         }
     },
     "minimum-stability": "stable",

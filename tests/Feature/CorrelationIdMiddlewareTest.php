@@ -341,4 +341,66 @@ class CorrelationIdMiddlewareTest extends TestCase
             '4bf92f3577b34da6a3ce929d0e0e4736'
         );
     }
+
+    public function test_traceparent_takes_precedence_over_correlation_id_header(): void
+    {
+        config()->set('correlation-id.w3c.enabled', true);
+        config()->set('correlation-id.w3c.accept_traceparent', true);
+        config()->set('correlation-id.trust_incoming', true);
+
+        $response = $this
+            ->withHeaders([
+                'traceparent' => '00-4bf92f3577b34da6a3ce929d0e0e4736-00f067aa0ba902b7-01',
+                'X-Correlation-ID' => 'client-correlation-id',
+            ])
+            ->get('/test');
+
+        $response->assertOk();
+
+        $response->assertHeader(
+            'X-Correlation-ID',
+            '4bf92f3577b34da6a3ce929d0e0e4736'
+        );
+    }
+
+    public function test_it_falls_back_to_correlation_id_when_traceparent_is_invalid(): void
+    {
+        config()->set('correlation-id.w3c.enabled', true);
+        config()->set('correlation-id.w3c.accept_traceparent', true);
+        config()->set('correlation-id.trust_incoming', true);
+
+        $response = $this
+            ->withHeaders([
+                'traceparent' => 'invalid-traceparent',
+                'X-Correlation-ID' => 'client-correlation-id',
+            ])
+            ->get('/test');
+
+        $response->assertOk();
+
+        $response->assertHeader(
+            'X-Correlation-ID',
+            'client-correlation-id'
+        );
+    }
+
+    public function test_it_ignores_traceparent_when_w3c_is_disabled(): void
+    {
+        config()->set('correlation-id.w3c.enabled', false);
+        config()->set('correlation-id.trust_incoming', true);
+
+        $response = $this
+            ->withHeaders([
+                'traceparent' => '00-4bf92f3577b34da6a3ce929d0e0e4736-00f067aa0ba902b7-01',
+                'X-Correlation-ID' => 'client-correlation-id',
+            ])
+            ->get('/test');
+
+        $response->assertOk();
+
+        $response->assertHeader(
+            'X-Correlation-ID',
+            'client-correlation-id'
+        );
+    }
 }

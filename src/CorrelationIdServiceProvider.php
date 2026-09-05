@@ -9,6 +9,8 @@ use LaravelCorrelationId\Http\Middleware\CorrelationIdMiddleware;
 
 use Illuminate\Log\LogManager;
 use LaravelCorrelationId\Logging\CorrelationIdProcessor;
+use Illuminate\Support\Facades\Http;
+use LaravelCorrelationId\Http\CorrelationIdRequestMiddleware;
 
 
 class CorrelationIdServiceProvider extends ServiceProvider
@@ -33,6 +35,10 @@ class CorrelationIdServiceProvider extends ServiceProvider
         $this->app['router']->aliasMiddleware(
             'correlation-id',
             CorrelationIdMiddleware::class
+        );
+
+        Http::globalRequestMiddleware(
+            $this->app->make(CorrelationIdRequestMiddleware::class)
         );
 
         $this->publishes([

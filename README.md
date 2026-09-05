@@ -491,6 +491,23 @@ composer check
 
 Make sure tests, formatting, and Composer validation pass, and add tests for new behavior.
 
+
+See `CONTRIBUTING.md` for additional guidelines.
+
+---
+
+## Changelog
+
+See `CHANGELOG.md` for release changes.
+
+---
+
+## Security Vulnerabilities
+
+Do not disclose security vulnerabilities publicly through GitHub issues.
+
+See `SECURITY.md` for the responsible disclosure process.
+
 ---
 
 ## License

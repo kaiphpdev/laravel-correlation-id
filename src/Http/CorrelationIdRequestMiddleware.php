@@ -42,7 +42,8 @@ class CorrelationIdRequestMiddleware
         ) {
 
             $traceparent = $this->traceparentGenerator->generate(
-                $this->manager->getTraceId()
+                $this->manager->getTraceId(),
+                $this->manager->getTraceFlags() ?? '00'
             );
 
             if ($traceparent !== null) {

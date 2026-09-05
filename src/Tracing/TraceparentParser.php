@@ -12,6 +12,13 @@ class TraceparentParser
 
     public function extractTraceId(?string $traceparent): ?string
     {
+        $context = $this->parse($traceparent);
+
+        return $context['trace_id'] ?? null;
+    }
+
+    public function parse(?string $traceparent): ?array
+    {
         if (! is_string($traceparent) || $traceparent === '') {
             return null;
         }
@@ -27,6 +34,7 @@ class TraceparentParser
         $version = strtolower($matches[1]);
         $traceId = strtolower($matches[2]);
         $parentId = strtolower($matches[3]);
+        $traceFlags = strtolower($matches[4]);
 
         if ($version === 'ff') {
             return null;
@@ -40,6 +48,11 @@ class TraceparentParser
             return null;
         }
 
-        return $traceId;
+        return [
+            'version' => $version,
+            'trace_id' => $traceId,
+            'parent_id' => $parentId,
+            'trace_flags' => $traceFlags,
+        ];
     }
 }

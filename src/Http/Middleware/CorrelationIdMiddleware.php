@@ -30,22 +30,29 @@ class CorrelationIdMiddleware
 
         $correlationId = null;
         $traceId = null;
+        $traceContext = null;
 
         if (
             config('correlation-id.w3c.enabled', false)
             && config('correlation-id.w3c.accept_traceparent', true)
         ) {
-            $traceId = $this->traceparentParser->extractTraceId(
+            $traceContext = $this->traceparentParser->parse(
                 $request->header('traceparent')
             );
 
-            if ($traceId !== null) {
+            if ($traceContext !== null) {
+                $traceId = $traceContext['trace_id'];
                 $correlationId = $traceId;
             }
         }
 
-        if (! $correlationId && config('correlation-id.trust_incoming', true)) {
-            $incomingId = $request->header($header);
+        if (
+            ! $correlationId
+            && config('correlation-id.trust_incoming', true)
+        ) {
+            $incomingId = $request->header(
+                $header
+            );
 
             if ($this->validator->isValid($incomingId)) {
                 $correlationId = $incomingId;
@@ -56,17 +63,44 @@ class CorrelationIdMiddleware
             $correlationId = $this->generator->generate();
         }
 
-        $this->manager->set($correlationId);
+        /*
+         * Store the active correlation ID.
+         */
+        $this->manager->set(
+            $correlationId
+        );
 
-        if ($traceId !== null) {
-            $this->manager->setTraceId($traceId);
+        /*
+         * Store W3C trace context only when the incoming
+         * traceparent was valid.
+         */
+        if (
+            $traceId !== null
+            && $traceContext !== null
+        ) {
+            $this->manager->setTraceId(
+                $traceId
+            );
+
+            $this->manager->setTraceFlags(
+                $traceContext['trace_flags']
+            );
         }
 
-        $attributes = config('correlation-id.request_attribute', 'correlation_id');
-        $request->attributes->set($attributes, $correlationId);
+        $attribute = config(
+            'correlation-id.request_attribute',
+            'correlation_id'
+        );
+
+        $request->attributes->set(
+            $attribute,
+            $correlationId
+        );
 
         try {
-            $response = $next($request);
+            $response = $next(
+                $request
+            );
 
             $response->headers->set(
                 $header,

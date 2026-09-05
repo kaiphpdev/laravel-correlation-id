@@ -124,6 +124,15 @@ class CorrelationIdServiceProvider extends ServiceProvider
                 );
 
                 $payload[$traceKey] = $manager->getTraceId();
+
+                if ($manager->hasTraceFlags()) {
+                    $traceFlagsKey = config(
+                        'correlation-id.queue.trace_flags_payload_key',
+                        'trace_flags'
+                    );
+
+                    $payload[$traceFlagsKey] = $manager->getTraceFlags();
+                }
             }
 
             return $payload;

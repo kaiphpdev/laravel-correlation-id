@@ -8,6 +8,8 @@ class CorrelationIdManager
 
     protected ?string $traceId = null;
 
+    protected ?string $traceFlags = null;
+
     public function set(string $correlationId): void
     {
         $this->correlationId = $correlationId;
@@ -38,14 +40,31 @@ class CorrelationIdManager
         return $this->traceId !== null;
     }
 
+    public function setTraceFlags(string $traceFlags): void
+    {
+        $this->traceFlags = strtolower($traceFlags);
+    }
+
+    public function getTraceFlags(): ?string
+    {
+        return $this->traceFlags;
+    }
+
+    public function hasTraceFlags(): bool
+    {
+        return $this->traceFlags !== null;
+    }
+
     public function clearTraceId(): void
     {
         $this->traceId = null;
+        $this->traceFlags = null;
     }
 
     public function clear(): void
     {
         $this->correlationId = null;
         $this->traceId = null;
+        $this->traceFlags = null;
     }
 }

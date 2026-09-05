@@ -59,6 +59,24 @@ class RestoreCorrelationId
             return;
         }
 
-        $this->manager->setTraceId($traceId);
+        $this->manager->setTraceId(
+            strtolower($traceId)
+        );
+
+        $traceFlagsKey = config(
+            'correlation-id.queue.trace_flags_payload_key',
+            'trace_flags'
+        );
+
+        $traceFlags = $payload[$traceFlagsKey] ?? null;
+
+        if (
+            is_string($traceFlags)
+            && preg_match('/^[\da-f]{2}$/i', $traceFlags)
+        ) {
+            $this->manager->setTraceFlags(
+                strtolower($traceFlags)
+            );
+        }
     }
 }

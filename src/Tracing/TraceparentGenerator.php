@@ -10,18 +10,27 @@ class TraceparentGenerator
         protected TraceIdValidator $validator = new TraceIdValidator
     ) {}
 
-    public function generate(string $traceId): ?string
-    {
+    public function generate(
+        string $traceId,
+        string $traceFlags = '00'
+    ): ?string {
         if (! $this->validator->isValid($traceId)) {
             return null;
         }
 
-        $parentId = bin2hex(random_bytes(8));
+        if (! preg_match('/^[\da-f]{2}$/i', $traceFlags)) {
+            $traceFlags = '00';
+        }
+
+        $parentId = bin2hex(
+            random_bytes(8)
+        );
 
         return sprintf(
-            '00-%s-%s-00',
+            '00-%s-%s-%s',
             strtolower($traceId),
-            $parentId
+            $parentId,
+            strtolower($traceFlags)
         );
     }
 }

@@ -23,6 +23,8 @@ return [
     'queue' => [
         'enabled' => true,
         'payload_key' => 'correlation_id',
+        'trace_payload_key' => 'trace_id',
+        'trace_flags_payload_key' => 'trace_flags',
     ],
     'w3c' => [
         'enabled' => false,

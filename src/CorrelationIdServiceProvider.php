@@ -13,6 +13,14 @@ use Illuminate\Support\Facades\Http;
 use LaravelCorrelationId\Http\CorrelationIdRequestMiddleware;
 use Illuminate\Contracts\Debug\ExceptionHandler;
 use LaravelCorrelationId\Exceptions\CorrelationIdExceptionResponse;
+use Illuminate\Queue\Queue;
+
+use Illuminate\Queue\Events\JobExceptionOccurred;
+use Illuminate\Queue\Events\JobProcessed;
+use Illuminate\Queue\Events\JobProcessing;
+use Illuminate\Support\Facades\Event;
+use LaravelCorrelationId\Queue\ClearCorrelationId;
+use LaravelCorrelationId\Queue\RestoreCorrelationId;
 
 
 class CorrelationIdServiceProvider extends ServiceProvider
@@ -67,6 +75,42 @@ class CorrelationIdServiceProvider extends ServiceProvider
                     }
                 );
             }
+        );
+
+        Queue::createPayloadUsing(function (): array {
+            if (! config('correlation-id.queue.enabled', true)) {
+                return [];
+            }
+
+            $manager = $this->app->make(
+                CorrelationIdManager::class
+            );
+
+            if (! $manager->has()) return [];
+
+            $key = config(
+                'correlation-id.queue.payload_key',
+                'correlation_id'
+            );
+
+            return [
+                $key => $manager->get(),
+            ];
+        });
+
+        Event::listen(
+            JobProcessing::class,
+            RestoreCorrelationId::class
+        );
+
+        Event::listen(
+            JobProcessed::class,
+            [ClearCorrelationId::class, 'handleProcessed']
+        );
+
+        Event::listen(
+            JobExceptionOccurred::class,
+            [ClearCorrelationId::class, 'handleException']
         );
     }
     protected function registerLOgProcessor(): void

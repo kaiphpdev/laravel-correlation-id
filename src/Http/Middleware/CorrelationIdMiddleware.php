@@ -7,14 +7,15 @@ use Illuminate\Http\Request;
 use LaravelCorrelationId\CorrelationIdManager;
 use LaravelCorrelationId\Contracts\CorrelationIdGenerator;
 use Symfony\Component\HttpFoundation\Response;
+use LaravelCorrelationId\Validation\CorrelationIdValidator;
 
 class CorrelationIdMiddleware
 {
     public function __construct(
         protected CorrelationIdManager $manager,
-        protected CorrelationIdGenerator $generator
-    ) {
-    }
+        protected CorrelationIdGenerator $generator,
+        protected CorrelationIdValidator $validator
+    ) {}
 
     public function handle(Request $request, Closure $next): Response
     {
@@ -23,7 +24,11 @@ class CorrelationIdMiddleware
         $correlationId = null;
 
         if (config('correlation-id.trust_incoming', true)) {
-            $correlationId = $request->header($header);
+            $incomingId = $request->header($header);
+
+            if ($this->validator->isValid($incomingId)) {
+                $correlationId = $incomingId;
+            }
         }
 
         if (! $correlationId) {

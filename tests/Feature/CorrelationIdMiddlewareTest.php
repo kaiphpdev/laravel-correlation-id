@@ -66,4 +66,27 @@ class CorrelationIdMiddlewareTest extends TestCase
             $generatedId
         );
     }
+
+    public function test_it_generates_a_new_id_when_incoming_id_is_invalid(): void
+    {
+        $response = $this
+            ->withHeader(
+                'X-Correlation-ID',
+                'invalid correlation id'
+            )
+            ->get('/test');
+
+        $response->assertOk();
+
+        $generatedId = $response->headers->get(
+            'X-Correlation-ID'
+        );
+
+        $this->assertNotNull($generatedId);
+
+        $this->assertNotSame(
+            'invalid correlation id',
+            $generatedId
+        );
+    }
 }

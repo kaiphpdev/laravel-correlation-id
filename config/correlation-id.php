@@ -3,6 +3,12 @@
 return [
     'header' => 'X-Correlation-ID',
     'trust_incoming' => true,
+
+    'incoming' => [
+        'max_length' => 128,
+        'pattern' => '/^[A-Za-z0-9._:-]+$/',
+    ],
+    
     'logging' => [
         'enabled' => true,
         'key' => 'correlation_id',

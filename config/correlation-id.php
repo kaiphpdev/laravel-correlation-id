@@ -24,4 +24,9 @@ return [
         'enabled' => true,
         'payload_key' => 'correlation_id',
     ],
+    'w3c' => [
+        'enabled' => false,
+        'accept_traceparent' => true,
+        'propagate_traceparent' => true,
+    ],
 ];

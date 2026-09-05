@@ -299,4 +299,46 @@ class CorrelationIdMiddlewareTest extends TestCase
 
         $this->assertFalse($manager->has());
     }
+
+    public function test_it_uses_trace_id_from_traceparent_when_w3c_is_enabled(): void
+    {
+        config()->set(
+            'correlation-id.w3c.enabled',
+            true
+        );
+
+        $response = $this
+            ->withHeader(
+                'traceparent',
+                '00-4bf92f3577b34da6a3ce929d0e0e4736-00f067aa0ba902b7-01'
+            )
+            ->get('/test');
+
+        $response->assertOk();
+
+        $response->assertHeader(
+            'X-Correlation-ID',
+            '4bf92f3577b34da6a3ce929d0e0e4736'
+        );
+    }
+
+    public function test_traceparent_takes_precedence_over_correlation_header_when_enabled(): void
+    {
+        config()->set(
+            'correlation-id.w3c.enabled',
+            true
+        );
+
+        $response = $this
+            ->withHeaders([
+                'traceparent' => '00-4bf92f3577b34da6a3ce929d0e0e4736-00f067aa0ba902b7-01',
+                'X-Correlation-ID' => 'manual-id',
+            ])
+            ->get('/test');
+
+        $response->assertHeader(
+            'X-Correlation-ID',
+            '4bf92f3577b34da6a3ce929d0e0e4736'
+        );
+    }
 }

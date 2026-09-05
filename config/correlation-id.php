@@ -2,6 +2,7 @@
 
 return [
     'header' => 'X-Correlation-ID',
+    'request_attribute' => 'correlation_id',
     'trust_incoming' => true,
 
     'incoming' => [

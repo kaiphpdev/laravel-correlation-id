@@ -5,6 +5,7 @@ namespace LaravelCorrelationId\Tests\Feature;
 use Illuminate\Support\Facades\Route;
 use LaravelCorrelationId\Tests\TestCase;
 use LaravelCorrelationId\CorrelationIdManager;
+use Illuminate\Http\Request;
 
 class CorrelationIdMiddlewareTest extends TestCase
 {
@@ -20,6 +21,13 @@ class CorrelationIdMiddlewareTest extends TestCase
         Route::middleware('correlation-id')
             ->get('/test-exception', function () {
                 throw new \RuntimeException('Test exception');
+            });
+
+        Route::middleware('correlation-id')
+            ->get('/test-request-attribute', function (Request $request) {
+                return response()->json([
+                    'correlation_id' => $request->attributes->get('correlation_id')
+                ]);
             });
     }
 
@@ -149,4 +157,45 @@ class CorrelationIdMiddlewareTest extends TestCase
             'abc-123'
         );
     }
+
+    public function test_it_stores_correlation_id_in_request_attributes(): void
+    {
+        $response = $this
+            ->withHeader('X-Correlation-ID', 'abc-123')
+            ->get('/test-request-attribute');
+
+        $response->assertOk();
+
+        $response->assertJson([
+            'correlation_id' => 'abc-123',
+        ]);
+    }
+
+
+    public function test_it_uses_configured_request_attribute_name(): void
+{
+    config()->set(
+        'correlation-id.request_attribute',
+        'request_id'
+    );
+
+    Route::middleware('correlation-id')
+        ->get('/test-custom-attribute', function (Request $request) {
+            return response()->json([
+                'request_id' => $request->attributes->get(
+                    'request_id'
+                ),
+            ]);
+        });
+
+    $response = $this
+        ->withHeader('X-Correlation-ID', 'abc-123')
+        ->get('/test-custom-attribute');
+
+    $response->assertOk();
+
+    $response->assertJson([
+        'request_id' => 'abc-123',
+    ]);
+}
 }

@@ -40,6 +40,9 @@ class CorrelationIdMiddleware
 
         $this->manager->set($correlationId);
 
+        $attributes = config('correlation-id.request_attribute', 'correlation_id');
+        $request->attributes->set($attributes, $correlationId);
+
         try {
             $response = $next($request);
 

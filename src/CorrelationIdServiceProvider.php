@@ -5,6 +5,7 @@ namespace LaravelCorrelationId;
 use Illuminate\Support\ServiceProvider;
 use LaravelCorrelationId\Contracts\CorrelationIdGenerator;
 use LaravelCorrelationId\Generators\UuidGenerator;
+use LaravelCorrelationId\Http\Middleware\CorrelationIdMiddleware;
 
 class CorrelationIdServiceProvider extends ServiceProvider
 {
@@ -17,5 +18,12 @@ class CorrelationIdServiceProvider extends ServiceProvider
             UuidGenerator::class
         );
     }
-    public function boot(): void {}
+
+    public function boot(): void
+    {
+        $this->app['router']->aliasMiddleware(
+            'correlation-id',
+            CorrelationIdMiddleware::class
+        );
+    }
 }

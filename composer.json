@@ -19,6 +19,11 @@
     ],
     "require": {
         "php": "^8.2",
+        "illuminate/contracts": "^11.0|^12.0",
+        "illuminate/http": "^11.0|^12.0",
+        "illuminate/log": "^11.0|^12.0",
+        "illuminate/queue": "^11.0|^12.0",
+        "illuminate/routing": "^11.0|^12.0",
         "illuminate/support": "^11.0|^12.0"
     },
     "require-dev": {
@@ -50,9 +55,9 @@
         "test": "phpunit",
         "format": "pint",
         "format-check": "pint --test",
-        "validate": "composer validate --strict",
+        "validate-composer": "composer validate --strict",
         "check": [
-            "@validate",
+            "@validate-composer",
             "@format-check",
             "@test"
         ]

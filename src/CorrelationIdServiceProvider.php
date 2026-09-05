@@ -154,7 +154,7 @@ class CorrelationIdServiceProvider extends ServiceProvider
         );
     }
 
-    protected function registerLOgProcessor(): void
+    protected function registerLogProcessor(): void
     {
         $logManager = $this->app->make(LogManager::class);
 
